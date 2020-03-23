@@ -16,9 +16,11 @@ $ python3 --version
 
 ## Setup
 
-To setup the Kubernetes Cluster just execute the Python setup.py file:
+To setup the Kubernetes Cluster you must clone the github repository, enter the Kubernetes directory and execute the Python setup.py file:
 
 ```
+$ git clone git@github.com:devcarlos/KubernetesLocalVagrant.git
+$ cd kubernetes
 $ python3 setup.py
 ```
 
