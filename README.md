@@ -29,11 +29,3 @@ To check nodes and available information about the cluster run:
 ```
 $ python3 status.py
 ```
-
-## Manage Cluster
-
-To start/stop the cluster just execute:
-
-```
-$ python3 manage.py start|stop
-```
