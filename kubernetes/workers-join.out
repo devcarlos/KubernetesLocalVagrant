@@ -1,0 +1,2 @@
+  kubeadm join kv-scaler.lab.local:6443 --token i6srat.h32g30uhipu0w73j \
+    --discovery-token-ca-cert-hash sha256:210195572cabd3593c42540278cd015f181eea18631e12609f579ec748a42f0e \
