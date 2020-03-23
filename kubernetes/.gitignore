@@ -1,1 +1,6 @@
 .vagrant
+.kube/config
+hosts.out
+kubeadm-init.out
+masters-join.out
+workers-join.out
