@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# local kubernetes cluster
+# version: 0.1.0
+# description: this is the scaler (load balancer) script file
+# created by Carlos Alcala - carlos.alcala@me.com
+
+KVMSG=$1
+SCALER_IP=$2
+MASTER_IPS=$(echo $3 | sed -e 's/,//g' -e 's/\]//g' -e 's/\[//g')
+
+### Install packages to allow apt to use a repository over HTTPS
+apt-get update && apt-get install apt-transport-https ca-certificates curl software-properties-common haproxy
+
+### Add Docker’s official GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+### Add Docker apt repository.
+add-apt-repository \
+  "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) \
+  stable"
+
+add-apt-repository ppa:vbernat/haproxy-2.0 -y
+
+apt-get update
+
+apt-get install -y avahi-daemon libnss-mdns traceroute htop httpie bash-completion haproxy ruby docker-ce
+
+cat >> /etc/haproxy/haproxy.cfg <<EOF
+frontend kv-scaler
+    bind *:6443
+    mode tcp
+    log global
+    option tcplog
+    timeout client 3600s
+    backlog 4096
+    maxconn 50000
+    use_backend kv-masters
+
+backend kv-masters
+    mode  tcp
+    option log-health-checks
+    option redispatch
+    option tcplog
+    balance roundrobin
+    timeout connect 1s
+    timeout queue 5s
+    timeout server 3600s
+EOF
+
+i=0
+for mips in $MASTER_IPS; do
+  echo "    server kv-master-$i $mips:6443 check" >> /etc/haproxy/haproxy.cfg
+  ((i++))
+done
+
+cat > /vagrant/hosts.out<<EOF
+# Added by Kubernetes
+$SCALER_IP     kv-scaler.lab.local     kv-scaler.local     kv-scaler
+EOF
+
+cat /vagrant/hosts.out >> /etc/hosts
+
+systemctl restart haproxy
