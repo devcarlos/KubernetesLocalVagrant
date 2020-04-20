@@ -14,8 +14,8 @@ BOX_IMAGE = "bento/ubuntu-16.04"
 # Change these values if you wish to play with the
 # cluster size. Do this before starting your cluster
 # provisioning.
-MASTER_COUNT = 2
-WORKER_COUNT = 2
+MASTER_COUNT = 1
+WORKER_COUNT = 3
 
 # Change these values if you wish to play with the
 # VMs memory resources.
@@ -140,6 +140,8 @@ class KvLab
             wget -q #{MASTER_SCRIPT_URL} -O #{LOCAL_MASTER_SCRIPT}
             chmod +x #{LOCAL_MASTER_SCRIPT}
             #{LOCAL_MASTER_SCRIPT} "#{KVMSG}" #{i} #{POD_CIDR} #{masterIp} #{MASTER_COUNT == 1 ? "single" : "multi"}
+
+            sed 's/127\.0\.0\.1/#{masterIp} kv-master-#{i}/' -i /etc/hosts
           SCRIPT
         end
       end
