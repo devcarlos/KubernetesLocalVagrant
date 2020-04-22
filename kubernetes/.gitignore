@@ -1,5 +1,6 @@
 .vagrant
-.kube/config
+.vagrant/
+.kube/
 hosts.out
 kubeadm-init.out
 masters-join.out
