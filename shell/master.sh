@@ -10,7 +10,9 @@ POD_CIDR=$3
 MASTER_IP=$4
 MASTER_TYPE=$5
 
-wget -q https://docs.projectcalico.org/v3.10/manifests/calico.yaml -O /tmp/calico-default.yaml
+# kubectl apply -f https://docs.projectcalico.org/v3.11/manifests/calico.yaml
+wget -q https://docs.projectcalico.org/v3.11/manifests/calico.yaml -O /tmp/calico-default.yaml
+
 sed "s+192.168.0.0/16+$POD_CIDR+g" /tmp/calico-default.yaml > /tmp/calico-defined.yaml
 
 if [ $MASTER_TYPE = "single" ]; then
@@ -58,6 +60,10 @@ cp -i /etc/kubernetes/admin.conf /vagrant/.kube/config
 if (( $NODE == 0 )) ; then
     kubectl apply -f /tmp/calico-defined.yaml
 fi
+
+cat /vagrant/hosts.out >> /etc/hosts
+
+systemctl restart haproxy
 
 echo KUBELET_EXTRA_ARGS=--node-ip=$MASTER_IP  > /etc/default/kubelet
 systemctl restart networking
